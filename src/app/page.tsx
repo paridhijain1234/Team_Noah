@@ -136,6 +136,7 @@ export default function Home() {
       </section>
       {/* Add spacing before footer */}
       <div className="h-12 md:h-20" />
+      <Timeline />
       <Footer />
     </main>
   );
