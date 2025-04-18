@@ -1,10 +1,18 @@
-"use client"
+"use client";
 
-import { Button } from "@/components/ui/button"
-import { ChevronRight, BookOpen, FileText, Languages, HelpCircle, BookA } from "lucide-react"
-import Navbar from "@/components/navbar"
-import FeatureCard from "@/components/feature-card"
-import { motion } from "framer-motion"
+import { Button } from "@/components/ui/button";
+import {
+  ChevronRight,
+  BookOpen,
+  FileText,
+  Languages,
+  HelpCircle,
+  BookA,
+} from "lucide-react";
+import Navbar from "@/components/navbar";
+import FeatureCard from "@/components/feature-card";
+import { motion } from "framer-motion";
+import Footer from "@/components/footer";
 
 export default function Home() {
   const features = [
@@ -38,7 +46,7 @@ export default function Home() {
       icon: <BookA className="h-10 w-10 text-yellow-500" />,
       delay: 0.5,
     },
-  ]
+  ];
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -54,7 +62,8 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              Your <span className="text-yellow-400">AI-Powered</span> Study Companion
+              Your <span className="text-yellow-400">AI-Powered</span> Study
+              Companion
             </motion.h1>
             <motion.p
               className="text-lg md:text-xl text-gray-300"
@@ -62,8 +71,9 @@ export default function Home() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.1 }}
             >
-              Padhai Buddy helps you study smarter, not harder. Our AI tools make learning more efficient, engaging, and
-              accessible for students of all ages.
+              Padhai Buddy helps you study smarter, not harder. Our AI tools
+              make learning more efficient, engaging, and accessible for
+              students of all ages.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -91,7 +101,10 @@ export default function Home() {
       </section>
 
       {/* Features Section */}
-      <section className="bg-gray-900 py-20 rounded-t-[3rem]">
+      <section
+        id="features"
+        className="bg-gray-900 py-24 md:py-28 rounded-[3rem] mt-12"
+      >
         <div className="container mx-auto px-4">
           <motion.div
             className="text-center mb-16"
@@ -103,7 +116,8 @@ export default function Home() {
               <span className="text-yellow-400">AI-Powered</span> Features
             </h2>
             <p className="text-lg text-gray-300 max-w-2xl mx-auto">
-              Discover how Padhai Buddy can transform your study experience with these powerful tools.
+              Discover how Padhai Buddy can transform your study experience with
+              these powerful tools.
             </p>
           </motion.div>
 
@@ -120,6 +134,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+      {/* Add spacing before footer */}
+      <div className="h-12 md:h-20" />
+      <Footer />
     </main>
-  )
+  );
 }
