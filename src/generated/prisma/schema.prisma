@@ -15,11 +15,13 @@ datasource db {
 }
 
 model User {
-  id      Int       @id @default(autoincrement())
-  email   String    @unique
-  name    String?
-  Account Account[]
-  Session Session[]
+  id            Int       @id @default(autoincrement())
+  email         String    @unique
+  name          String?
+  emailVerified DateTime?
+  image         String?
+  Account       Account[]
+  Session       Session[]
 }
 
 model Account {
