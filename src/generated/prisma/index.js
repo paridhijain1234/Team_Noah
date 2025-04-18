@@ -159,7 +159,7 @@ const config = {
       "value": "prisma-client-js"
     },
     "output": {
-      "value": "C:\\Users\\athar\\OneDrive\\Documents\\projects\\team\\src\\generated\\prisma",
+      "value": "C:\\Users\\hp\\OneDrive\\Desktop\\team noah\\Team_Noah\\src\\generated\\prisma",
       "fromEnvVar": null
     },
     "config": {
@@ -173,12 +173,11 @@ const config = {
       }
     ],
     "previewFeatures": [],
-    "sourceFilePath": "C:\\Users\\athar\\OneDrive\\Documents\\projects\\team\\prisma\\schema.prisma",
+    "sourceFilePath": "C:\\Users\\hp\\OneDrive\\Desktop\\team noah\\Team_Noah\\prisma\\schema.prisma",
     "isCustomOutput": true
   },
   "relativeEnvPaths": {
-    "rootEnvPath": null,
-    "schemaEnvPath": "../../../.env"
+    "rootEnvPath": null
   },
   "relativePath": "../../../prisma",
   "clientVersion": "6.6.0",
@@ -187,7 +186,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
-  "postinstall": false,
+  "postinstall": true,
   "inlineDatasources": {
     "db": {
       "url": {

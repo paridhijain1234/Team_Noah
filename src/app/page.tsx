@@ -12,6 +12,7 @@ import {
 import Navbar from "@/components/navbar";
 import FeatureCard from "@/components/feature-card";
 import { motion } from "framer-motion";
+import Timeline from "@/components/Timeline";
 import Footer from "@/components/footer";
 
 export default function Home() {
@@ -92,7 +93,7 @@ export default function Home() {
             transition={{ duration: 0.5, delay: 0.3 }}
           >
             <img
-              src="/placeholder.svg?height=400&width=500"
+              src="/padhai.png"
               alt="Students studying with Padhai Buddy"
               className="w-full h-auto rounded-2xl shadow-lg"
             />

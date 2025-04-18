@@ -122,22 +122,6 @@ const Timeline = () => {
           </div>
         </div>
       </section>
-
-      {/* Testimonials Section */}
-      <section className="py-20 relative">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-yellow-900/20 via-gray-950 to-gray-950"></div>
-        <div className="container relative z-10 mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-2xl text-center mb-16">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">
-              <span className="bg-gradient-to-r from-yellow-400 via-amber-400 to-yellow-300 bg-clip-text text-transparent">
-                What Students Say
-              </span>
-            </h2>
-            <p className="mt-4 text-lg text-gray-300">
-              Join thousands of students who are transforming their study habits with Padhai Buddy.
-            </p>
-          </div>
-    </section>
   );
 };
 
