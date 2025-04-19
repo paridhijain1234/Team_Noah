@@ -16,11 +16,12 @@ const menuItems = [
 
 export default function Navbar() {
   const { data: session } = useSession();
+  console.log(session);
   const [menuState, setMenuState] = useState(false);
 
   const handleSignIn = async () => {
     try {
-      await signIn("google");
+      await signIn("google", { callbackUrl: "/agents" });
       // Toast will show after successful redirect back
     } catch (error) {
       toast.error("Failed to sign in", {

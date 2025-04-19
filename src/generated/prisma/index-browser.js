@@ -137,7 +137,8 @@ exports.Prisma.AccountScalarFieldEnum = {
   token_type: 'token_type',
   scope: 'scope',
   id_token: 'id_token',
-  session_state: 'session_state'
+  session_state: 'session_state',
+  refresh_token_expires_in: 'refresh_token_expires_in'
 };
 
 exports.Prisma.SessionScalarFieldEnum = {
