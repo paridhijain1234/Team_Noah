@@ -7,6 +7,25 @@ const genAI = new GoogleGenerativeAI(
   process.env.GOOGLE_GENERATIVE_AI_API_KEY || ""
 );
 
+/**
+ * Calculates cosine similarity between two vectors
+ */
+function cosineSimilarity(vecA: number[], vecB: number[]): number {
+  if (vecA.length !== vecB.length) {
+    throw new Error("Vectors must have the same length");
+  }
+
+  const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
+  const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
+  const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
+
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    return 0;
+  }
+
+  return dotProduct / (magnitudeA * magnitudeB);
+}
+
 export async function POST(req: Request) {
   try {
     const { messages, pdfId } = await req.json();
@@ -14,54 +33,54 @@ export async function POST(req: Request) {
 
     let context = "";
     if (pdfId) {
+      console.log(`Looking up PDF data for ID: ${pdfId}`);
       const pdfData = embeddingStore.get(pdfId);
       console.log("PDF Data found:", pdfData ? "Yes" : "No");
-      console.log(
-        "PDF Data structure:",
-        pdfData ? Object.keys(pdfData) : "No data"
-      );
 
-      if (pdfData && pdfData.embeddings && pdfData.embeddings.length > 0) {
+      if (pdfData) {
+        console.log("PDF Data structure:", Object.keys(pdfData));
         console.log("Number of embeddings:", pdfData.embeddings.length);
-        console.log(
-          "Sample embedding structure:",
-          Object.keys(pdfData.embeddings[0])
-        );
 
-        // Get embedding for the user's question
-        const model = genAI.getGenerativeModel({ model: "text-embedding-004" });
-        const result = await model.embedContent(lastMessage.content);
-        const questionEmbedding = result.embedding.values;
-        console.log("Question embedding length:", questionEmbedding.length);
+        if (pdfData.embeddings && pdfData.embeddings.length > 0) {
+          // Get embedding for the user's question
+          const model = genAI.getGenerativeModel({
+            model: "text-embedding-004",
+          });
+          const result = await model.embedContent(lastMessage.content);
+          const questionEmbedding = result.embedding.values;
+          console.log("Question embedding length:", questionEmbedding.length);
 
-        // Find most relevant chunks
-        const relevantChunks = findRelevantChunks(
-          questionEmbedding,
-          pdfData.embeddings,
-          5 // Increased number of chunks for better context
-        );
-
-        console.log("Relevant chunks found:", relevantChunks.length);
-        if (relevantChunks.length > 0) {
-          console.log(
-            "Sample relevant chunk:",
-            relevantChunks[0].content.substring(0, 100) + "..."
+          // Find most relevant chunks
+          const relevantChunks = findRelevantChunks(
+            questionEmbedding,
+            pdfData.embeddings,
+            5 // Increased number of chunks for better context
           );
-        }
 
-        // Combine relevant chunks into context with metadata
-        context = relevantChunks
-          .map((chunk, index) => {
-            const metadata = chunk.metadata || {};
-            return `[Context ${index + 1}]:
+          console.log("Relevant chunks found:", relevantChunks.length);
+          if (relevantChunks.length > 0) {
+            console.log(
+              "Sample relevant chunk:",
+              relevantChunks[0].content.substring(0, 100) + "..."
+            );
+          }
+
+          // Combine relevant chunks into context with metadata
+          context = relevantChunks
+            .map((chunk, index) => {
+              const metadata = chunk.metadata || {};
+              return `[Context ${index + 1}]:
 ${chunk.content}
 [Metadata: Page ${metadata.pageNumber || "unknown"}, Chunk ${
-              metadata.chunkNumber || "unknown"
-            }]`;
-          })
-          .join("\n\n");
+                metadata.chunkNumber || "unknown"
+              }]`;
+            })
+            .join("\n\n");
+        } else {
+          console.warn("No valid embeddings found in PDF data");
+        }
       } else {
-        console.warn("No valid embeddings found in PDF data");
+        console.warn("No PDF data found for ID:", pdfId);
       }
     }
 
@@ -108,22 +127,4 @@ function findRelevantChunks(
   return similarities
     .sort((a, b) => b.similarity - a.similarity)
     .slice(0, topK);
-}
-
-function cosineSimilarity(a: number[], b: number[]): number {
-  if (a.length !== b.length) {
-    console.warn(`Vector length mismatch: ${a.length} vs ${b.length}`);
-    return 0;
-  }
-
-  const dotProduct = a.reduce((sum, val, i) => sum + val * b[i], 0);
-  const magnitudeA = Math.sqrt(a.reduce((sum, val) => sum + val * val, 0));
-  const magnitudeB = Math.sqrt(b.reduce((sum, val) => sum + val * val, 0));
-
-  if (magnitudeA === 0 || magnitudeB === 0) {
-    console.warn("Zero magnitude vector detected");
-    return 0;
-  }
-
-  return dotProduct / (magnitudeA * magnitudeB);
 }

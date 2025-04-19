@@ -25,8 +25,8 @@ class EmbeddingStore {
   private storagePath: string;
 
   private constructor() {
-    // Create storage directory if it doesn't exist
-    this.storagePath = path.join(process.cwd(), ".embeddings");
+    // Initialize storage path
+    this.storagePath = path.join(process.cwd(), "data", "embeddings");
     if (!fs.existsSync(this.storagePath)) {
       fs.mkdirSync(this.storagePath, { recursive: true });
     }
@@ -50,7 +50,7 @@ class EmbeddingStore {
           this.store.set(data.id, data);
         }
       }
-      console.log("Loaded embeddings from storage:", this.store.size);
+      console.log(`Loaded ${this.store.size} embeddings from storage`);
     } catch (error) {
       console.error("Error loading from storage:", error);
     }
@@ -60,22 +60,60 @@ class EmbeddingStore {
     try {
       const filePath = path.join(this.storagePath, `${id}.json`);
       fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+      console.log(`Saved embedding to ${filePath}`);
     } catch (error) {
       console.error("Error saving to storage:", error);
     }
   }
 
   save(id: string, data: PDFEmbedding) {
+    console.log(`Saving PDF data with ID: ${id}`);
+    console.log(`Number of embeddings: ${data.embeddings.length}`);
+
     const dataWithTimestamp = {
       ...data,
       timestamp: Date.now(),
     };
+
+    // Save to memory
     this.store.set(id, dataWithTimestamp);
+    console.log(`Store size after save: ${this.store.size}`);
+
+    // Save to file
     this.saveToStorage(id, dataWithTimestamp);
   }
 
   get(id: string): PDFEmbedding | undefined {
-    return this.store.get(id);
+    console.log(`Getting PDF data for ID: ${id}`);
+
+    // Try to get from memory first
+    let data = this.store.get(id);
+
+    // If not in memory, try to load from file
+    if (!data) {
+      try {
+        const filePath = path.join(this.storagePath, `${id}.json`);
+        if (fs.existsSync(filePath)) {
+          const loadedData = JSON.parse(fs.readFileSync(filePath, "utf-8"));
+          if (loadedData && loadedData.id && loadedData.embeddings) {
+            data = loadedData as PDFEmbedding;
+            // Update memory cache
+            this.store.set(id, data);
+            console.log(`Loaded PDF data from file for ID: ${id}`);
+          }
+        }
+      } catch (error) {
+        console.error(`Error loading PDF data for ID ${id}:`, error);
+      }
+    }
+
+    if (data) {
+      console.log(`Found PDF data with ${data.embeddings.length} embeddings`);
+    } else {
+      console.log("No PDF data found");
+    }
+
+    return data;
   }
 
   getAll(): PDFEmbedding[] {
@@ -90,7 +128,7 @@ class EmbeddingStore {
         fs.unlinkSync(filePath);
       }
     } catch (error) {
-      console.error("Error deleting from storage:", error);
+      console.error(`Error deleting PDF data for ID ${id}:`, error);
     }
   }
 
