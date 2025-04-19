@@ -21,7 +21,6 @@ import { ExportToGoogleDocs } from "@/components/agent-displays/ExportToGoogleDo
 // Import icons
 import { FileTextIcon, UploadCloudIcon, FileIcon, XIcon, AlertCircle, BrainIcon, BookOpenIcon, Languages, ScrollText, FileQuestion, CheckSquare } from "lucide-react";
 
-// Define types for results to fix the any type issue
 interface AgentResult {
   [key: string]: unknown;
 }
