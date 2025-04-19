@@ -1,66 +1,66 @@
-import { askGemini } from "../gemini";
+import { AgentMessage, CoreAIAgent } from "../ai";
 
-/**
- * Master agent function that decides a pipeline based on the task description.
- * It returns a JSON-formatted string that indicates the steps.
- */
-export async function masterAgent(
-  input: string
-): Promise<{ name: string; args?: any[] }[]> {
-  const prompt = `You are a pipeline orchestrator. Analyze the input and respond ONLY with a JSON array describing the pipeline steps.
+export class MasterAgent {
+  private coreAgent: CoreAIAgent;
 
-Rules:
-1. Your response must be valid JSON
-2. Start with '[' and end with ']'
-3. Each step must have a "name" field
-4. Use only these agent names: "summarize", "translate", "qa", "explain"
-5. DO NOT include any text before or after the JSON
-6. DO NOT include markdown formatting
+  constructor(apiKey: string) {
+    this.coreAgent = new CoreAIAgent(apiKey);
+  }
 
-Available agents:
-- summarize: Summarizes lengthy text
-- translate: Translates text to a specified language
-- qa: Provides concise answers based on context and a question
-- explain: Explains complex concepts simply
+  /**
+   * Generates a pipeline plan based on the user input.
+   *
+   * Returns an array of objects representing the pipeline.
+   * Example output:
+   * [
+   *   { "name": "summarize", "args": [] },
+   *   { "name": "translate", "args": ["Spanish"] }
+   * ]
+   */
+  async generatePipelinePlan(
+    userInput: string
+  ): Promise<{ name: string; args?: any[] }[]> {
+    const prompt = `
+Given the user input below, determine the best pipeline of AI agents to process the input.
+The available agents are:
+  - summarize: Summarizes lengthy text.
+  - translate: Translates text into a target language. Default to English if text is not in English, otherwise use the specified target language.
+  - qa: Answers questions based on context.
+  - explain: Explains complex topics in simple terms.
 
-Example valid responses:
-[{"name":"summarize","args":[]}]
-[{"name":"translate","args":["Spanish"]}]
-[{"name":"qa","args":["What is the main idea?"]}]
+Return your answer as a JSON array where each element contains the agent "name" and an optional "args" array.
 
-Input to analyze:
-${input}`;
+IMPORTANT: The order of agents in the pipeline matters significantly and must be optimized for the particular task.
+- If non-English text needs to be processed, translation should typically occur early in the pipeline.
+- If text is very long, summarization might need to happen before other processing.
+- Consider the most logical sequence that will produce the best final output.
 
-  const result = await askGemini(prompt);
-  try {
-    // Clean the response to ensure it only contains JSON
-    const cleanResult = result.trim().replace(/^```json\s*|\s*```$/g, "");
-    const pipelinePlan = JSON.parse(cleanResult);
+For translation, if no target language is specified and the text appears to be in a non-English language, use English as the default target language.
 
-    // Validate the structure
-    if (!Array.isArray(pipelinePlan)) {
-      throw new Error("Pipeline plan must be an array");
+User Input:
+${userInput}
+
+Example output:
+[
+  { "name": "summarize", "args": [] },
+  { "name": "translate", "args": ["Spanish"] }
+]
+`;
+    const messages: AgentMessage[] = [{ role: "system", content: prompt }];
+    const result = await this.coreAgent.complete({
+      model: "Qwen/Qwen2.5-Coder-32B-Instruct",
+      temperature: 0,
+      messages,
+    });
+    try {
+      const pipelinePlan = JSON.parse(result);
+      return pipelinePlan;
+    } catch (error) {
+      console.error(
+        "Error parsing master agent output. Defaulting to a simple summarize pipeline.",
+        error
+      );
+      return [{ name: "summarize", args: [] }];
     }
-
-    if (
-      !pipelinePlan.every(
-        (step) =>
-          typeof step === "object" &&
-          step !== null &&
-          typeof step.name === "string" &&
-          ["summarize", "translate", "qa", "explain"].includes(step.name)
-      )
-    ) {
-      throw new Error("Invalid pipeline step format");
-    }
-
-    return pipelinePlan;
-  } catch (error) {
-    console.error(
-      "Failed to parse pipeline plan. Defaulting to summarization.",
-      error
-    );
-    // Fallback: default to a simple summarization pipeline
-    return [{ name: "summarize", args: [] }];
   }
 }

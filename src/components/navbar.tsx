@@ -1,116 +1,148 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useSession, signIn, signOut } from "next-auth/react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
-import { motion } from "framer-motion";
-import { redirect } from "next/navigation";
+import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import { CatIcon } from "lucide-react";
+import { ModeToggle } from "./ui/mode-toggle";
 
 export default function Navbar() {
-  const [isScrolled, setIsScrolled] = useState(false);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { data: session } = useSession();
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 10) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
+  const handleSignIn = async () => {
+    try {
+      await signIn("google");
+      // Toast will show after successful redirect back
+    } catch (error) {
+      toast.error("Failed to sign in", {
+        description:
+          "There was a problem signing in with Google. Please try again.",
+      });
+    }
+  };
 
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const navLinks = [
-    { name: "Home", href: "#" },
-    { name: "Features", href: "#" },
-    { name: "About", href: "#" },
-    { name: "Contact", href: "#" },
-  ];
+  const handleSignOut = async () => {
+    try {
+      toast.success("Signed out successfully", {
+        description: "You have been signed out of your account.",
+      });
+      // Small delay to allow the toast to show before redirect
+      setTimeout(() => {
+        signOut({ callbackUrl: "/" });
+      }, 300);
+    } catch (error) {
+      toast.error("Failed to sign out", {
+        description: "There was a problem signing out. Please try again.",
+      });
+    }
+  };
 
   return (
-    <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-black/90 backdrop-blur-md py-3 shadow-md"
-          : "bg-transparent py-5"
-      }`}
-    >
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between">
-          <Link href="/" className="flex items-center">
-            {/* <div className="h-10 w-10 bg-yellow-400 rounded-lg flex items-center justify-center mr-2">
-              <span className="font-bold text-black text-xl">PB</span>
-            </div> */}
-            <span className="font-bold text-xl md:text-2xl text-white">
-              Padhai Buddy
-            </span>
-          </Link>
-
-          {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
-            {navLinks.map((link) => (
+    <div className="fixed top-8 left-1/2 -translate-x-1/2 z-50">
+      <div className="bg-background/80 backdrop-blur-md rounded-full border shadow-lg px-6 py-3">
+        <NavigationMenu>
+          <NavigationMenuList className="space-x-1">
+            <NavigationMenuItem>
               <Link
-                key={link.name}
-                href={link.href}
-                className="text-gray-300 hover:text-yellow-400 transition-colors font-medium"
+                href="/"
+                className={cn(
+                  navigationMenuTriggerStyle(),
+                  "rounded-full px-4"
+                )}
               >
-                {link.name}
+                <CatIcon />
               </Link>
-            ))}
-            <Button
-              onClick={() => redirect("/dashboard/agent")}
-              className="bg-yellow-400 hover:bg-yellow-500 text-black font-medium"
-            >
-              Try Now
-            </Button>
-          </nav>
+            </NavigationMenuItem>
+            {/* <NavigationMenuItem>
+              <Link
+                href="/"
+                className={cn(
+                  navigationMenuTriggerStyle(),
+                  "rounded-full px-4"
+                )}
+              >
+                <CatIcon />
+              </Link>
+            </NavigationMenuItem> */}
+            <NavigationMenuItem>
+              <Link
+                href="/agents"
+                className={cn(
+                  navigationMenuTriggerStyle(),
+                  "rounded-full px-4"
+                )}
+              >
+                Demo
+              </Link>
+            </NavigationMenuItem>
 
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden text-white"
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          >
-            {isMobileMenuOpen ? (
-              <X className="h-6 w-6" />
-            ) : (
-              <Menu className="h-6 w-6" />
-            )}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Navigation */}
-      {isMobileMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0, height: 0 }}
-          animate={{ opacity: 1, height: "auto" }}
-          exit={{ opacity: 0, height: 0 }}
-          transition={{ duration: 0.3 }}
-          className="md:hidden bg-black/95 backdrop-blur-md"
-        >
-          <div className="container mx-auto px-4 py-4">
-            <nav className="flex flex-col space-y-4">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  className="text-gray-300 hover:text-yellow-400 transition-colors font-medium py-2"
-                  onClick={() => setIsMobileMenuOpen(false)}
+            <NavigationMenuItem className="ml-1">
+              {session ? (
+                <NavigationMenuTrigger className="rounded-full">
+                  <div className="flex items-center gap-2.5 px-1">
+                    <Avatar className="h-7 w-7">
+                      <AvatarImage
+                        src={session.user?.image ?? ""}
+                        alt={session.user?.name ?? ""}
+                      />
+                      <AvatarFallback className="text-xs">
+                        {session.user?.name?.charAt(0) ?? "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium">
+                      {session.user?.name?.split(" ")[0]}
+                    </span>
+                  </div>
+                </NavigationMenuTrigger>
+              ) : (
+                <button
+                  onClick={handleSignIn}
+                  className={cn(
+                    navigationMenuTriggerStyle(),
+                    "rounded-full px-5"
+                  )}
                 >
-                  {link.name}
-                </Link>
-              ))}
-              <Button className="bg-yellow-400 hover:bg-yellow-500 text-black font-medium w-full">
-                Try Now
-              </Button>
-            </nav>
-          </div>
-        </motion.div>
-      )}
-    </header>
+                  Sign in
+                </button>
+              )}
+
+              {session && (
+                <NavigationMenuContent>
+                  <div className="p-3 w-[220px]">
+                    <div className="flex flex-col gap-2.5 p-2">
+                      <div className="text-sm font-medium">
+                        {session.user?.name}
+                      </div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {session.user?.email}
+                      </div>
+                      <button
+                        onClick={handleSignOut}
+                        className="text-sm text-red-500 hover:text-red-600 mt-3 text-left flex items-center gap-2"
+                      >
+                        Sign out
+                      </button>
+                    </div>
+                  </div>
+                </NavigationMenuContent>
+              )}
+            </NavigationMenuItem>
+            <NavigationMenuItem>
+              <ModeToggle />
+            </NavigationMenuItem>
+          </NavigationMenuList>
+        </NavigationMenu>
+      </div>
+    </div>
   );
 }
