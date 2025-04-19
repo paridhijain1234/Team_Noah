@@ -8,11 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { agentRegistry } from "@/lib/agents/agentRegistry";
 import { useEffect, useCallback, useState, useRef } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
+// Import our display components
 // Import our display components
 import { ExplainDisplay } from "@/components/agent-displays/ExplainDisplay";
 import { SummarizeDisplay } from "@/components/agent-displays/SummarizeDisplay";
-import { QADisplay } from "@/components/agent-displays/QADisplay";
 import { TranslateDisplay } from "@/components/agent-displays/TranslateDisplay";
 
 // Import icons
@@ -22,6 +24,9 @@ import { FileTextIcon, UploadCloudIcon, FileIcon, XIcon, AlertCircle } from "luc
 interface AgentResult {
   [key: string]: string | Record<string, string>;
 }
+import { FlashcardDisplay } from "@/components/agent-displays/FlashcardDisplay";
+import { QuizDisplay } from "@/components/agent-displays/QuizDisplay";
+import { PracticeProblemsDisplay } from "@/components/agent-displays/PracticeProblemsDisplay";
 
 const AgentsPage = () => {
   const [userInput, setUserInput] = useState<string>("");
@@ -40,9 +45,15 @@ const AgentsPage = () => {
   // Refs
   const fileInputRef = useRef<HTMLInputElement>(null);
   const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const [showAgentSelection, setShowAgentSelection] = useState<boolean>(false);
 
   // Get available agent names from registry
   const agentNames = Object.keys(agentRegistry);
+
+  // State for selected agents
+  const [selectedAgents, setSelectedAgents] = useState<string[]>([]);
+  const [selectAll, setSelectAll] = useState<boolean>(false);
+
   
   // For tracking progress
   const [progress, setProgress] = useState<number>(0);
@@ -77,6 +88,38 @@ const AgentsPage = () => {
       }
     };
   }, []);
+
+  // Effect to handle selectAll changes
+  useEffect(() => {
+    if (selectAll) {
+      setSelectedAgents([...agentNames]);
+    } else if (selectedAgents.length === agentNames.length) {
+      setSelectedAgents([]);
+    }
+  }, [selectAll]);
+
+  // Update selectAll when individual selections change
+  useEffect(() => {
+    if (selectedAgents.length === agentNames.length) {
+      setSelectAll(true);
+    } else if (selectAll) {
+      setSelectAll(false);
+    }
+  }, [selectedAgents]);
+
+  const toggleAgentSelection = (agentName: string) => {
+    setSelectedAgents((prev) => {
+      if (prev.includes(agentName)) {
+        return prev.filter((name) => name !== agentName);
+      } else {
+        return [...prev, agentName];
+      }
+    });
+  };
+
+  const toggleSelectAll = () => {
+    setSelectAll(!selectAll);
+  };
 
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -209,6 +252,12 @@ const AgentsPage = () => {
   const processTextInput = useCallback(async () => {
     if (!userInput.trim() || !apiKey) return;
 
+    // Ensure at least one agent is selected when agent selection is enabled
+    if (showAgentSelection && selectedAgents.length === 0) {
+      alert("Please select at least one agent to process your text.");
+      return;
+    }
+
     setIsProcessing(true);
     setResults({});
     setProgress(0);
@@ -239,6 +288,7 @@ const AgentsPage = () => {
         body: JSON.stringify({
           text: userInput,
           apiKey,
+          selectedAgents: showAgentSelection ? selectedAgents : undefined,
         }),
       });
 
@@ -253,12 +303,10 @@ const AgentsPage = () => {
       // Mark all agents as completed
       setProcessingAgents({});
 
-      // Automatically select the first available tab if "summarize" isn't available
+      // Automatically select the first available tab
       const resultKeys = Object.keys(data.results);
-      if (resultKeys.length > 0 && !resultKeys.includes("summarize")) {
+      if (resultKeys.length > 0) {
         setActiveTab(resultKeys[0]);
-      } else if (resultKeys.includes("summarize")) {
-        setActiveTab("summarize");
       }
     } catch (error) {
       console.error("Error processing agents:", error);
@@ -269,7 +317,7 @@ const AgentsPage = () => {
       setIsProcessing(false);
       setProcessingAgents({});
     }
-  }, [userInput, apiKey, agentNames]);
+  }, [userInput, apiKey, agentNames, selectedAgents, showAgentSelection]);
 
   // Agent metadata for better visualization
   const agentInfo = {
@@ -522,8 +570,6 @@ const AgentsPage = () => {
                       <ExplainDisplay data={result} />
                     ) : agentName === "summarize" ? (
                       <SummarizeDisplay data={result} />
-                    ) : agentName === "qa" ? (
-                      <QADisplay data={result} />
                     ) : agentName === "translate" ? (
                       <TranslateDisplay data={result} />
                     ) : (

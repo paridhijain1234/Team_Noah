@@ -3,7 +3,7 @@ import { agentRegistry } from "@/lib/agents/agentRegistry";
 
 export async function POST(request: Request) {
   try {
-    const { text, apiKey } = await request.json();
+    const { text, apiKey, selectedAgents } = await request.json();
 
     // Validate the request
     if (!text || !text.trim()) {
@@ -20,12 +20,35 @@ export async function POST(request: Request) {
       );
     }
 
-    // Process with all agents
-    const agentNames = Object.keys(agentRegistry);
+    // Determine which agents to run
+    let agentsToRun: string[];
+
+    if (
+      selectedAgents &&
+      Array.isArray(selectedAgents) &&
+      selectedAgents.length > 0
+    ) {
+      // Use only the selected agents that exist in the registry
+      agentsToRun = selectedAgents.filter((agent) =>
+        Object.keys(agentRegistry).includes(agent)
+      );
+
+      // If no valid agents were selected, return an error
+      if (agentsToRun.length === 0) {
+        return NextResponse.json(
+          { error: "No valid agents were selected" },
+          { status: 400 }
+        );
+      }
+    } else {
+      // If no agents were specified, run all agents (original behavior)
+      agentsToRun = Object.keys(agentRegistry);
+    }
+
     const results: Record<string, any> = {};
 
-    // Process agents sequentially
-    for (const agentName of agentNames) {
+    // Process selected agents sequentially
+    for (const agentName of agentsToRun) {
       try {
         const agent = agentRegistry[agentName];
         const result = await agent(text, apiKey);

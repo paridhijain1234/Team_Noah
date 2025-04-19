@@ -7,7 +7,7 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge"; // We'll need to create this component if it doesn't exist
+
 
 interface SummarizeAgentOutput {
   title: string;
