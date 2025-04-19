@@ -39,3 +39,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+.embeddings/49f63b33-7cd0-4680-b43c-344282f457c1.json

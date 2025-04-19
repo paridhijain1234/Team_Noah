@@ -92,14 +92,14 @@ async function extractTextFromPDF(file: File): Promise<string> {
     // Convert file to array buffer for processing
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    
+
     // Use pdf-parse to extract text from the PDF
     const data = await pdfParse(buffer);
-    
+
     // Return extracted text
     return data.text;
   } catch (error) {
     console.error("Error extracting text from PDF:", error);
     throw new Error("Failed to extract text from PDF");
   }
-} 
+}

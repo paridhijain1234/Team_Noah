@@ -6,7 +6,7 @@ async function runExample() {
   console.log("===============================================");
   console.log("🚀 PADHAI-BUDDY EXAMPLE EXECUTION STARTING");
   console.log("===============================================");
-  
+
   // Configuration section
   console.log("\n📝 CONFIGURATION");
   console.log("-----------------------------------------------");
@@ -16,7 +16,7 @@ async function runExample() {
     process.exit(1);
   }
   console.log("✅ API Key loaded successfully");
-  
+
   // Input section
   console.log("\n📥 USER INPUT");
   console.log("-----------------------------------------------");
@@ -67,10 +67,10 @@ DC回路は直列または並列に構成できます。
 キルヒホッフの電圧法則（KVL）：閉ループの周りのすべての電圧の総和はゼロになります。
 
 直流回路は、ほとんどの電子機器の動作を理解する上で不可欠です。直流回路の解析方法を学ぶことで、電気工学と電子工学のより深い概念の基礎を築くことができます。`;
-  
+
   console.log(`Input length: ${userInput.length} characters`);
   console.log(`Input preview: ${userInput.substring(0, 100)}...`);
-  
+
   // Planning section
   console.log("\n🧠 PLANNING PHASE");
   console.log("-----------------------------------------------");
@@ -78,21 +78,21 @@ DC回路は直列または並列に構成できます。
   const masterAgent = new MasterAgent(apiKey);
   const pipelinePlan = await masterAgent.generatePipelinePlan(userInput);
   console.log("✅ Pipeline plan generated");
-  
+
   console.log("\n⏳ Creating detailed execution plan via Planner Agent...");
   const plannerAgent = new PlannerAgent(apiKey);
   const detailedPlan = await plannerAgent.planDetailedExecution(userInput);
   console.log("✅ Detailed execution plan created");
-  
+
   // Display planning details
   console.log("\n📊 PLANNING DETAILS");
   console.log("-----------------------------------------------");
   console.log("📌 Pipeline Plan:");
   console.log(JSON.stringify(pipelinePlan, null, 2));
-  
+
   console.log("\n📌 Detailed Execution Plan:");
   console.log(detailedPlan);
-  
+
   // Execution section
   console.log("\n⚙️ EXECUTION PHASE");
   console.log("-----------------------------------------------");
@@ -101,16 +101,16 @@ DC回路は直列または並列に構成できます。
   const { result, rationale } = await orchestrateUserInput(userInput, apiKey);
   const executionTime = ((Date.now() - startTime) / 1000).toFixed(2);
   console.log(`✅ Pipeline execution completed in ${executionTime} seconds`);
-  
+
   // Results section
   console.log("\n📋 RESULTS");
   console.log("-----------------------------------------------");
   console.log("📌 Pipeline Execution Rationale:");
   console.log(rationale);
-  
+
   console.log("\n📌 Final Output:");
   console.log(result);
-  
+
   console.log("\n===============================================");
   console.log("✅ PADHAI-BUDDY EXAMPLE EXECUTION COMPLETED");
   console.log("===============================================");
@@ -119,9 +119,8 @@ DC回路は直列または並列に構成できます。
 // Ensure this file runs only if executed directly (not imported as a module)
 if (require.main === module) {
   console.log("🔍 Running Padhai-Buddy example...");
-  runExample()
-    .catch(error => {
-      console.error("❌ Error during execution:", error);
-      process.exit(1);
-    });
+  runExample().catch((error) => {
+    console.error("❌ Error during execution:", error);
+    process.exit(1);
+  });
 }
