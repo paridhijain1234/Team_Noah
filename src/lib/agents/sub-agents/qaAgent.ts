@@ -1,48 +1,80 @@
 // qaAgent.ts
 import { CoreAIAgent } from "../../ai";
 
-export async function qaAgent(text: string, apiKey?: string): Promise<any> {
-  const prompt = `Generate 3 key questions and provide answers based on the following text.
+export async function qaAgent(
+  text: string,
+  apiKey?: string,
+  debug: boolean = false
+): Promise<any> {
+  const finalApiKey = apiKey || process.env.NEBIUS_API_KEY!;
+  const client = new CoreAIAgent(finalApiKey);
 
-Format your response as a JSON object with the following structure:
+  const prompt = `
+You are an AI assistant that extracts key questions and answers from educational content.
+
+Instructions:
+- Generate exactly 3 meaningful and relevant questions based on the text.
+- Provide clear, complete answers to each question.
+- Format your response strictly as a JSON object with this structure:
+
 {
-  "title": "A concise title related to the content",
+  "title": "Short, informative title about the content",
   "questions": [
     {
-      "question": "Question 1?",
-      "answer": "Detailed answer to question 1"
+      "question": "First question?",
+      "answer": "Detailed and accurate answer"
     },
     {
-      "question": "Question 2?",
-      "answer": "Detailed answer to question 2"
+      "question": "Second question?",
+      "answer": "Detailed and accurate answer"
     },
     {
-      "question": "Question 3?",
-      "answer": "Detailed answer to question 3"
+      "question": "Third question?",
+      "answer": "Detailed and accurate answer"
     }
   ]
 }
 
-Input text: ${text}`;
-
-  const finalApiKey = apiKey || process.env.NEBIUS_API_KEY!;
-  const client = new CoreAIAgent(finalApiKey);
+Here is the text:
+"""
+${text}
+"""`;
 
   const response = await client.complete({
     model: "Qwen/Qwen2.5-Coder-32B-Instruct",
-    messages: [{ role: "system", content: prompt }],
+    messages: [
+      {
+        role: "system",
+        content: "You are a helpful assistant that generates key questions and answers from text.",
+      },
+      {
+        role: "user",
+        content: prompt,
+      },
+    ],
     temperature: 0.2,
   });
 
+  const cleaned = response.trim().replace(/^```(?:json)?|```$/g, "");
+
   try {
-    // Parse the response as JSON
-    return JSON.parse(response);
+    return JSON.parse(cleaned);
   } catch (error) {
-    console.error("Failed to parse JSON response:", error);
-    // Fallback with a structured error
+    console.log(error);
+    // Fallback: Try extracting JSON object with regex
+    const jsonMatch = cleaned.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      try {
+        return JSON.parse(jsonMatch[0]);
+      } catch (e) {
+        if (debug) console.error("Fallback regex parse failed:", e);
+      }
+    }
+
+    if (debug) console.error("Full AI response:\n", response);
     return {
       error: true,
-      message: "Failed to parse AI response as JSON",
+      message: "Failed to parse AI response as valid JSON",
       rawResponse: response,
     };
   }
