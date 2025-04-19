@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Button } from "@/components/ui/button";
@@ -5,11 +6,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import { agentRegistry } from "@/lib/agents/agentRegistry";
 import { useEffect, useCallback, useState, useRef } from "react";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
 
 // Import our display components
 import { ExplainDisplay } from "@/components/agent-displays/ExplainDisplay";
@@ -36,7 +34,6 @@ const AgentsPage = () => {
   const [inputMode, setInputMode] = useState<"text" | "file">("text");
   
   // File upload state
-  const [isUploading, setIsUploading] = useState<boolean>(false);
   const [file, setFile] = useState<File | null>(null);
   const [dragActive, setDragActive] = useState<boolean>(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
@@ -182,7 +179,6 @@ const AgentsPage = () => {
   const uploadAndProcessFile = async () => {
     if (!file || !apiKey) return;
     
-    setIsUploading(true);
     setIsProcessing(true);
     setResults({});
     setProgress(0);
@@ -247,7 +243,6 @@ const AgentsPage = () => {
       if (progressIntervalRef.current) {
         clearInterval(progressIntervalRef.current);
       }
-      setIsUploading(false);
       setIsProcessing(false);
       setProcessingAgents({});
     }
