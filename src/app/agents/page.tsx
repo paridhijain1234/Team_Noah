@@ -6,12 +6,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { agentRegistry } from "@/lib/agents/agentRegistry";
 import { useEffect, useCallback, useState } from "react";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 
-// Import our new display components
+// Import our display components
 import { ExplainDisplay } from "@/components/agent-displays/ExplainDisplay";
 import { SummarizeDisplay } from "@/components/agent-displays/SummarizeDisplay";
-import { QADisplay } from "@/components/agent-displays/QADisplay";
 import { TranslateDisplay } from "@/components/agent-displays/TranslateDisplay";
+import { FlashcardDisplay } from "@/components/agent-displays/FlashcardDisplay";
+import { QuizDisplay } from "@/components/agent-displays/QuizDisplay";
+import { PracticeProblemsDisplay } from "@/components/agent-displays/PracticeProblemsDisplay";
 
 const AgentsPage = () => {
   const [userInput, setUserInput] = useState<string>("");
@@ -19,10 +23,15 @@ const AgentsPage = () => {
   const [results, setResults] = useState<Record<string, any>>({});
   const [activeTab, setActiveTab] = useState<string>("summarize");
   const [apiKey, setApiKey] = useState<string | null>(null);
+  const [showAgentSelection, setShowAgentSelection] = useState<boolean>(false);
 
   // Get available agent names from registry
   const agentNames = Object.keys(agentRegistry);
-  const totalSteps = agentNames.length;
+
+  // State for selected agents
+  const [selectedAgents, setSelectedAgents] = useState<string[]>([]);
+  const [selectAll, setSelectAll] = useState<boolean>(false);
+
   // For tracking progress
   const [currentStep, setCurrentStep] = useState<number>(0);
 
@@ -44,8 +53,46 @@ const AgentsPage = () => {
     fetchApiKey();
   }, []);
 
+  // Effect to handle selectAll changes
+  useEffect(() => {
+    if (selectAll) {
+      setSelectedAgents([...agentNames]);
+    } else if (selectedAgents.length === agentNames.length) {
+      setSelectedAgents([]);
+    }
+  }, [selectAll]);
+
+  // Update selectAll when individual selections change
+  useEffect(() => {
+    if (selectedAgents.length === agentNames.length) {
+      setSelectAll(true);
+    } else if (selectAll) {
+      setSelectAll(false);
+    }
+  }, [selectedAgents]);
+
+  const toggleAgentSelection = (agentName: string) => {
+    setSelectedAgents((prev) => {
+      if (prev.includes(agentName)) {
+        return prev.filter((name) => name !== agentName);
+      } else {
+        return [...prev, agentName];
+      }
+    });
+  };
+
+  const toggleSelectAll = () => {
+    setSelectAll(!selectAll);
+  };
+
   const processInput = useCallback(async () => {
     if (!userInput.trim() || !apiKey) return;
+
+    // Ensure at least one agent is selected when agent selection is enabled
+    if (showAgentSelection && selectedAgents.length === 0) {
+      alert("Please select at least one agent to process your text.");
+      return;
+    }
 
     setIsProcessing(true);
     setResults({});
@@ -60,6 +107,7 @@ const AgentsPage = () => {
         body: JSON.stringify({
           text: userInput,
           apiKey,
+          selectedAgents: showAgentSelection ? selectedAgents : undefined,
         }),
       });
 
@@ -70,19 +118,17 @@ const AgentsPage = () => {
       const data = await response.json();
       setResults(data.results);
 
-      // Automatically select the first available tab if "summarize" isn't available
+      // Automatically select the first available tab
       const resultKeys = Object.keys(data.results);
-      if (resultKeys.length > 0 && !resultKeys.includes("summarize")) {
+      if (resultKeys.length > 0) {
         setActiveTab(resultKeys[0]);
-      } else if (resultKeys.includes("summarize")) {
-        setActiveTab("summarize");
       }
     } catch (error) {
       console.error("Error processing agents:", error);
     } finally {
       setIsProcessing(false);
     }
-  }, [userInput, apiKey]);
+  }, [userInput, apiKey, selectedAgents, showAgentSelection]);
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-muted p-4">
@@ -114,10 +160,60 @@ const AgentsPage = () => {
             />
           </div>
 
+          <div className="flex items-center mb-4">
+            <Checkbox
+              id="agent-selection"
+              checked={showAgentSelection}
+              onCheckedChange={() => setShowAgentSelection(!showAgentSelection)}
+            />
+            <Label htmlFor="agent-selection" className="ml-2">
+              Choose specific agents to run
+            </Label>
+          </div>
+
+          {/* Agent selection checkboxes */}
+          {showAgentSelection && (
+            <div className="border rounded-md p-4 mb-4 bg-gray-50 dark:bg-gray-900/20">
+              <div className="flex items-center mb-4">
+                <Checkbox
+                  id="select-all-agents"
+                  checked={selectAll}
+                  onCheckedChange={toggleSelectAll}
+                />
+                <Label htmlFor="select-all-agents" className="ml-2 font-medium">
+                  Select All Agents
+                </Label>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {agentNames.map((agentName) => (
+                  <div key={agentName} className="flex items-center">
+                    <Checkbox
+                      id={`agent-${agentName}`}
+                      checked={selectedAgents.includes(agentName)}
+                      onCheckedChange={() => toggleAgentSelection(agentName)}
+                    />
+                    <Label
+                      htmlFor={`agent-${agentName}`}
+                      className="ml-2 capitalize"
+                    >
+                      {agentName}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div className="flex justify-end">
             <Button
               onClick={processInput}
-              disabled={isProcessing || !userInput.trim() || !apiKey}
+              disabled={
+                isProcessing ||
+                !userInput.trim() ||
+                !apiKey ||
+                (showAgentSelection && selectedAgents.length === 0)
+              }
             >
               {isProcessing ? "Processing..." : "Process with Agents"}
             </Button>
@@ -131,14 +227,16 @@ const AgentsPage = () => {
                   Processing with Agents
                 </h3>
                 <div className="space-y-4">
-                  {agentNames.map((name) => (
-                    <div key={name} className="flex items-center space-x-3">
-                      <div className="h-3 w-3 rounded-full bg-blue-500 animate-pulse" />
-                      <span className="capitalize text-blue-500">
-                        {name} Agent
-                      </span>
-                    </div>
-                  ))}
+                  {(showAgentSelection ? selectedAgents : agentNames).map(
+                    (name) => (
+                      <div key={name} className="flex items-center space-x-3">
+                        <div className="h-3 w-3 rounded-full bg-blue-500 animate-pulse" />
+                        <span className="capitalize text-blue-500">
+                          {name} Agent
+                        </span>
+                      </div>
+                    )
+                  )}
                 </div>
                 <p className="mt-4 text-sm text-muted-foreground">
                   Processing your text... This may take a moment.
@@ -179,10 +277,14 @@ const AgentsPage = () => {
                       <ExplainDisplay data={result} />
                     ) : agentName === "summarize" ? (
                       <SummarizeDisplay data={result} />
-                    ) : agentName === "qa" ? (
-                      <QADisplay data={result} />
                     ) : agentName === "translate" ? (
                       <TranslateDisplay data={result} />
+                    ) : agentName === "flashcard" ? (
+                      <FlashcardDisplay data={result} />
+                    ) : agentName === "quiz" ? (
+                      <QuizDisplay data={result} />
+                    ) : agentName === "practiceProblems" ? (
+                      <PracticeProblemsDisplay data={result} />
                     ) : (
                       // Fallback for any other agent types that may be added in the future
                       <div className="prose max-w-none dark:prose-invert">

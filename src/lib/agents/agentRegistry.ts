@@ -1,7 +1,9 @@
 import { summarizeAgent } from "./sub-agents/summarizeAgent";
 import { translateAgent } from "./sub-agents/translateAgent";
-import { qaAgent } from "./sub-agents/qaAgent";
 import { explainAgent } from "./sub-agents/explainAgent";
+import { flashcardAgent } from "./sub-agents/flashcardAgent";
+import { quizAgent } from "./sub-agents/quizAgent";
+import { practiceProblemsAgent } from "./sub-agents/practiceProblemsAgent";
 
 export const agentRegistry: Record<
   string,
@@ -9,6 +11,8 @@ export const agentRegistry: Record<
 > = {
   summarize: summarizeAgent,
   translate: translateAgent,
-  qa: qaAgent,
   explain: explainAgent,
+  flashcard: flashcardAgent,
+  quiz: quizAgent,
+  practiceProblems: practiceProblemsAgent,
 };
