@@ -18,14 +18,14 @@ export default function HeroSection() {
                 <section className="overflow-hidden bg-white dark:bg-transparent">
                     <div className="relative mx-auto max-w-5xl px-6 py-28 lg:py-24">
                         <div className="relative z-10 mx-auto max-w-2xl text-center">
-                            <h1 className="text-balance text-4xl font-semibold md:text-5xl lg:text-6xl">Modern Software testing reimagined</h1>
-                            <p className="mx-auto my-8 max-w-2xl text-xl">Officiis laudantium excepturi ducimus rerum dignissimos, and tempora nam vitae, excepturi ducimus iste provident dolores.</p>
+                            <h1 className="text-balance text-4xl font-semibold md:text-5xl lg:text-6xl">Educational Agents Made For Your Studies</h1>
+                            <p className="mx-auto my-8 max-w-2xl text-xl">your learning journey with personalized ai agents.</p>
 
                             <Button
                                 asChild
                                 size="lg">
                                 <Link href="#">
-                                    <span className="btn-label">Start Building</span>
+                                    <span className="btn-label">Start Learning</span>
                                 </Link>
                             </Button>
                         </div>
@@ -63,104 +63,20 @@ export default function HeroSection() {
 
                                     <Image
                                         className="rounded-(--radius) z-1 relative border dark:hidden"
-                                        src="/card.png"
+                                        src="/hero.png"
                                         alt="Tailark hero section"
                                         width={2880}
                                         height={2074}
                                     />
                                     <Image
                                         className="rounded-(--radius) z-1 relative hidden border dark:block"
-                                        src="/dark-card.webp"
+                                        src="/hero.png"
                                         alt="Tailark hero section"
                                         width={2880}
                                         height={2074}
                                     />
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </section>
-                <section className="bg-background relative z-10 py-16">
-                    <div className="m-auto max-w-5xl px-6">
-                        <h2 className="text-center text-lg font-medium">Your favorite companies are our partners.</h2>
-                        <div className="mx-auto mt-20 flex max-w-4xl flex-wrap items-center justify-center gap-x-12 gap-y-8 sm:gap-x-16 sm:gap-y-12">
-                            <img
-                                className="h-5 w-fit dark:invert"
-                                src="https://html.tailus.io/blocks/customers/nvidia.svg"
-                                alt="Nvidia Logo"
-                                height="20"
-                                width="auto"
-                            />
-                            <img
-                                className="h-4 w-fit dark:invert"
-                                src="https://html.tailus.io/blocks/customers/column.svg"
-                                alt="Column Logo"
-                                height="16"
-                                width="auto"
-                            />
-                            <img
-                                className="h-4 w-fit dark:invert"
-                                src="https://html.tailus.io/blocks/customers/github.svg"
-                                alt="GitHub Logo"
-                                height="16"
-                                width="auto"
-                            />
-                            <img
-                                className="h-5 w-fit dark:invert"
-                                src="https://html.tailus.io/blocks/customers/nike.svg"
-                                alt="Nike Logo"
-                                height="20"
-                                width="auto"
-                            />
-                            <img
-                                className="h-4 w-fit dark:invert"
-                                src="https://html.tailus.io/blocks/customers/laravel.svg"
-                                alt="Laravel Logo"
-                                height="16"
-                                width="auto"
-                            />
-                            <img
-                                className="h-7 w-fit dark:invert"
-                                src="https://html.tailus.io/blocks/customers/lilly.svg"
-                                alt="Lilly Logo"
-                                height="28"
-                                width="auto"
-                            />
-                            <img
-                                className="h-5 w-fit dark:invert"
-                                src="https://html.tailus.io/blocks/customers/lemonsqueezy.svg"
-                                alt="Lemon Squeezy Logo"
-                                height="20"
-                                width="auto"
-                            />
-                            <img
-                                className="h-6 w-fit dark:invert"
-                                src="https://html.tailus.io/blocks/customers/openai.svg"
-                                alt="OpenAI Logo"
-                                height="24"
-                                width="auto"
-                            />
-                            <img
-                                className="h-4 w-fit dark:invert"
-                                src="https://html.tailus.io/blocks/customers/tailwindcss.svg"
-                                alt="Tailwind CSS Logo"
-                                height="16"
-                                width="auto"
-                            />
-                            <img
-                                className="h-5 w-fit dark:invert"
-                                src="https://html.tailus.io/blocks/customers/vercel.svg"
-                                alt="Vercel Logo"
-                                height="20"
-                                width="auto"
-                            />
-                            <img
-                                className="h-5 w-fit dark:invert"
-                                src="https://html.tailus.io/blocks/customers/zapier.svg"
-                                alt="Zapier Logo"
-                                height="20"
-                                width="auto"
-                            />
                         </div>
                     </div>
                 </section>

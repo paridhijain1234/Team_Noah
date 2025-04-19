@@ -384,7 +384,7 @@ const AgentsPage = () => {
         </div>
 
         {/* Input Card */}
-        <Card className="mb-6 shadow-sm border border-muted">
+        <Card className="mb-6 shadow-sm bg-transparent relative transition-all duration-300 border-0 bg-gradient-to-br from-transparent via-transparent to-transparent border-primary/30 hover:border-primary/50 focus:border-primary/70 shadow-[0_0_15px_rgba(129,140,248,0.1)] hover:shadow-[0_0_20px_rgba(167,139,250,0.25)] focus:shadow-[0_0_25px_rgba(217,70,239,0.3)]">
           <CardHeader className="pb-2 flex flex-row items-center justify-between">
             <CardTitle className="text-lg font-medium">Input</CardTitle>
             
