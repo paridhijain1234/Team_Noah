@@ -30,7 +30,7 @@ const steps = [
 const Timeline = () => {
   return (
     <section className="bg-black text-yellow-400 py-16 px-6">
-      <div className="max-w-5xl mx-auto text-center">
+      <div className="max-w-5xl mx-auto ">
         <h2 className="text-3xl md:text-4xl font-bold text-yellow-300 mb-4">
           How Padhai Buddy Works
         </h2>

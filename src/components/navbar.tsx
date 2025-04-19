@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
 import { motion } from "framer-motion";
+import { redirect } from "next/navigation";
 
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -60,7 +61,10 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
-            <Button className="bg-yellow-400 hover:bg-yellow-500 text-black font-medium">
+            <Button
+              onClick={() => redirect("/dashboard/agent")}
+              className="bg-yellow-400 hover:bg-yellow-500 text-black font-medium"
+            >
               Try Now
             </Button>
           </nav>

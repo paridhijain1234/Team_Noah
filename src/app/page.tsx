@@ -1,5 +1,4 @@
 "use client";
-
 import { Button } from "@/components/ui/button";
 import {
   ChevronRight,
@@ -13,6 +12,7 @@ import Navbar from "@/components/navbar";
 import FeatureCard from "@/components/feature-card";
 import { motion } from "framer-motion";
 import Footer from "@/components/footer";
+import Timeline from "@/components/Timeline";
 
 export default function Home() {
   const features = [
@@ -72,8 +72,7 @@ export default function Home() {
               transition={{ duration: 0.5, delay: 0.1 }}
             >
               Padhai Buddy helps you study smarter, not harder. Our AI tools
-              make learning more efficient, engaging, and accessible for
-              students of all ages.
+              make learning more efficient, engaging, and accessible for students of all ages.
             </motion.p>
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -92,7 +91,7 @@ export default function Home() {
             transition={{ duration: 0.5, delay: 0.3 }}
           >
             <img
-              src="/placeholder.svg?height=400&width=500"
+              src="/hero.png"
               alt="Students studying with Padhai Buddy"
               className="w-full h-auto rounded-2xl shadow-lg"
             />
