@@ -16,6 +16,7 @@ import { TranslateDisplay } from "@/components/agent-displays/TranslateDisplay";
 import { FlashcardDisplay } from "@/components/agent-displays/FlashcardDisplay";
 import { QuizDisplay } from "@/components/agent-displays/QuizDisplay";
 import { PracticeProblemsDisplay } from "@/components/agent-displays/PracticeProblemsDisplay";
+import { ExportToGoogleDocs } from "@/components/agent-displays/ExportToGoogleDocs";
 
 // Import icons
 import { FileTextIcon, UploadCloudIcon, FileIcon, XIcon, AlertCircle, BrainIcon, BookOpenIcon, Languages, ScrollText, FileQuestion, CheckSquare } from "lucide-react";
@@ -615,6 +616,16 @@ const AgentsPage = () => {
         {/* Results */}
         {Object.keys(results).length > 0 && (
           <div className="animate-in fade-in duration-300">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-lg font-medium">Results</h2>
+              
+              {/* Add Export to Google Docs button */}
+              <ExportToGoogleDocs 
+                results={results} 
+                title={`AI Learning Notes - ${new Date().toLocaleDateString()}`} 
+              />
+            </div>
+            
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
               <TabsList className="mb-4 flex gap-2 overflow-x-auto p-1 bg-muted rounded-lg">
                 {Object.keys(results).map((agentName) => (
